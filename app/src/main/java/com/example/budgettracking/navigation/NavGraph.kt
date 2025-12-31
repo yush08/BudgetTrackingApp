@@ -1,28 +1,31 @@
 package com.example.budgettracking.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.budgettracking.screens.*
 
 @Composable
-fun NavGraph(navController: NavHostController) {
-
+fun NavGraph(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     NavHost(
         navController = navController,
-        startDestination = "splash"
+        startDestination = "splash",
+        modifier = modifier
     ) {
-        // ✅ Splash Screen
+
         composable("splash") {
-            SplashScreen(onFinish = {
+            SplashScreen {
                 navController.navigate("onboarding1") {
                     popUpTo("splash") { inclusive = true }
                 }
-            })
+            }
         }
 
-        // ✅ Onboarding
         composable("onboarding1") {
             OnboardingScreen1(
                 onNextClick = { navController.navigate("onboarding2") },
@@ -37,44 +40,61 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        composable(route = "onboarding3") {
+        composable("onboarding3") {
             OnboardingScreen3(
                 onGetStartedClick = {
-                    navController.navigate(route = "signin") {
-                        popUpTo(route = "onboarding1") { inclusive = true }
+                    navController.navigate("signin") {
+                        popUpTo("onboarding1") { inclusive = true }
                     }
                 },
-                onSkipClick = {
-                    navController.navigate("signin")
-                }
+                onSkipClick = { navController.navigate("signin") }
             )
         }
 
-
-        // Sign In
-        composable(route = "signin") {
+        composable("signin") {
             SignInScreen(
                 onLoginClick = { navController.navigate("home") },
                 onSignUpClick = { navController.navigate("signup") },
                 onForgotPasswordClick = { navController.navigate("forgot") }
             )
         }
-        // ✅ Sign Up
+
         composable("signup") {
             SignUpScreen(
                 onSignUpSuccess = { navController.navigate("home") },
                 onSignInClick = { navController.navigate("signin") }
             )
         }
-        // ✅ Forgot Password
+
         composable("forgot") {
-            ForgotPasswordScreen(onResetDone = {
+            ForgotPasswordScreen {
                 navController.navigate("signin")
-            })
+            }
         }
-        // ✅ Home
-        composable("home") {
-            HomeScreen()
+
+        composable(route = "home") {
+            HomeScreen(
+                onAddTransactionClick = {
+                    navController.navigate("add_transaction")
+                }
+            )
+        }
+
+
+        composable("stats") {
+            StatsScreen()
+        }
+
+        composable("insights") {
+            InsightsScreen()
+        }
+
+        composable("profile") {
+            ProfileScreen()
+        }
+
+        composable("add_transaction") {
+            AddExpenseScreen()
         }
     }
 }

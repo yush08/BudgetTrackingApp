@@ -1,4 +1,4 @@
-package com.example.budgettracking
+package com.example.budgettracking.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,12 +8,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
-
     private val auth = FirebaseAuth.getInstance()
-
     private val _authState = MutableStateFlow<String?>(null)
     val authState: StateFlow<String?> = _authState
-
     // 🔹 Sign up user
     fun signUp(email: String, password: String) {
         viewModelScope.launch {
@@ -23,7 +20,6 @@ class AuthViewModel : ViewModel() {
                 }
         }
     }
-
     // 🔹 Login user
     fun login(email: String, password: String) {
         viewModelScope.launch {
@@ -33,7 +29,6 @@ class AuthViewModel : ViewModel() {
                 }
         }
     }
-
     // 🔹 Check if user already logged in
     fun checkUser() {
         _authState.value = if (auth.currentUser != null) "AlreadyLoggedIn" else null

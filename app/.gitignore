@@ -12,10 +12,12 @@ local.properties
 captures/
 
 # Firebase
-app/google-services.json
+google-services.json
+
 
 # Kotlin
 .kotlin/
+
 
 # Keystore
 *.jks

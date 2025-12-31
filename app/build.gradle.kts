@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose") //For Kotlin 2.0
     id("com.google.gms.google-services")
+
 }
 
 android {
@@ -57,8 +58,9 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("com.google.firebase:firebase-auth")
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
-    implementation("com.google.firebase:firebase-firestore-ktx")
-    implementation("com.google.firebase:firebase-firestore-ktx:25.1.0")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+
 
 
 }
