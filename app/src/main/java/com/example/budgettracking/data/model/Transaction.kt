@@ -1,7 +1,11 @@
 package com.example.budgettracking.data.model
+
+import com.example.budgettracking.data.model.TransactionType
 data class Transaction(
-    val id: String,
+    val id: Long,
     val title: String,
-    val amount: Double, // If this is Double, use 500.0
-    val type: TransactionType
+    val amount: Double,
+    val type: TransactionType,
+    val note: String = "",
+    val timestamp: Long = System.currentTimeMillis()
 )

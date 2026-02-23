@@ -1,100 +1,177 @@
 package com.example.budgettracking.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.budgettracking.screens.*
+import com.example.budgettracking.viewmodel.BudgetViewModel
+import com.example.budgettracking.viewmodel.TransactionViewModel
+
+// ---------- ROUTES ----------
+const val SPLASH = "splash"
+const val ONBOARDING1 = "onboarding1"
+const val ONBOARDING2 = "onboarding2"
+const val ONBOARDING3 = "onboarding3"
+const val SIGNIN = "signin"
+const val SIGNUP = "signup"
+const val FORGOT = "forgot"
+
+const val HOME = "home"
+const val STATS = "stats"
+const val INSIGHTS = "insights"
+const val PROFILE = "profile"
+
+const val ADD_ENTRY_ROUTER = "add_entry_router"
+const val BUDGETS = "budgets"
+
+const val ADD_BUDGET_INCOME = "add_budget_income"
+const val ADD_BUDGET_DETAILS = "add_budget_details"
+
+const val ADD_TRANSACTION = "add_transaction"
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    // ✅ SINGLE INSTANCES
+    val budgetViewModel: BudgetViewModel = viewModel()
+    val transactionViewModel: TransactionViewModel = viewModel()
+
     NavHost(
         navController = navController,
-        startDestination = "splash",
+        startDestination = SPLASH,
         modifier = modifier
     ) {
 
-        composable("splash") {
+        // ---------- SPLASH ----------
+        composable(SPLASH) {
             SplashScreen {
-                navController.navigate("onboarding1") {
-                    popUpTo("splash") { inclusive = true }
+                navController.navigate(ONBOARDING1) {
+                    popUpTo(SPLASH) { inclusive = true }
                 }
             }
         }
 
-        composable("onboarding1") {
+        // ---------- ONBOARDING ----------
+        composable(ONBOARDING1) {
             OnboardingScreen1(
-                onNextClick = { navController.navigate("onboarding2") },
-                onSkipClick = { navController.navigate("signin") }
+                onNextClick = { navController.navigate(ONBOARDING2) },
+                onSkipClick = { navController.navigate(SIGNIN) }
             )
         }
 
-        composable("onboarding2") {
+        composable(ONBOARDING2) {
             OnboardingScreen2(
-                onNextClick = { navController.navigate("onboarding3") },
-                onSkipClick = { navController.navigate("signin") }
+                onNextClick = { navController.navigate(ONBOARDING3) },
+                onSkipClick = { navController.navigate(SIGNIN) }
             )
         }
 
-        composable("onboarding3") {
+        composable(ONBOARDING3) {
             OnboardingScreen3(
                 onGetStartedClick = {
-                    navController.navigate("signin") {
-                        popUpTo("onboarding1") { inclusive = true }
+                    navController.navigate(SIGNIN) {
+                        popUpTo(ONBOARDING1) { inclusive = true }
                     }
                 },
-                onSkipClick = { navController.navigate("signin") }
+                onSkipClick = { navController.navigate(SIGNIN) }
             )
         }
 
-        composable("signin") {
+        // ---------- AUTH ----------
+        composable(SIGNIN) {
             SignInScreen(
-                onLoginClick = { navController.navigate("home") },
-                onSignUpClick = { navController.navigate("signup") },
-                onForgotPasswordClick = { navController.navigate("forgot") }
+                onLoginClick = { navController.navigate(HOME) },
+                onSignUpClick = { navController.navigate(SIGNUP) },
+                onForgotPasswordClick = { navController.navigate(FORGOT) }
             )
         }
 
-        composable("signup") {
+        composable(SIGNUP) {
             SignUpScreen(
-                onSignUpSuccess = { navController.navigate("home") },
-                onSignInClick = { navController.navigate("signin") }
+                onSignUpSuccess = { navController.navigate(HOME) },
+                onSignInClick = { navController.navigate(SIGNIN) }
             )
         }
 
-        composable("forgot") {
+        composable(FORGOT) {
             ForgotPasswordScreen {
-                navController.navigate("signin")
+                navController.navigate(SIGNIN)
             }
         }
 
-        composable(route = "home") {
-            HomeScreen(
-                onAddTransactionClick = {
-                    navController.navigate("add_transaction")
+        // ---------- MAIN ----------
+        composable(HOME) { HomeScreen() }
+        composable(STATS) {
+            StatsScreen(viewModel = transactionViewModel)
+        }
+        composable(INSIGHTS) { InsightsScreen() }
+        composable(PROFILE) { ProfileScreen() }
+
+        // ---------- SMART ➕ ROUTER ----------
+        composable(ADD_ENTRY_ROUTER) {
+            LaunchedEffect(Unit) {
+                if (budgetViewModel.hasBudget()) {
+                    navController.navigate(BUDGETS) {
+                        popUpTo(ADD_ENTRY_ROUTER) { inclusive = true }
+                    }
+                } else {
+                    navController.navigate(ADD_BUDGET_INCOME) {
+                        popUpTo(ADD_ENTRY_ROUTER) { inclusive = true }
+                    }
+                }
+            }
+        }
+
+
+        // ---------- ADD BUDGET (STEP 1) ----------
+        composable(ADD_BUDGET_INCOME) {
+            AddBudgetIncomeScreen(
+                onContinue = { income ->
+                    budgetViewModel.saveIncome(income)
+                    navController.navigate(ADD_BUDGET_DETAILS)
                 }
             )
         }
 
-
-        composable("stats") {
-            StatsScreen()
+        // ---------- ADD BUDGET (STEP 2) ----------
+        composable(ADD_BUDGET_DETAILS) {
+            AddBudgetDetailScreen { name, target ->
+                budgetViewModel.createBudget(
+                    name = name,
+                    income = budgetViewModel.tempIncome,
+                    target = target
+                )
+                navController.navigate(BUDGETS) {
+                    popUpTo(ADD_BUDGET_INCOME) { inclusive = true }
+                }
+            }
         }
 
-        composable("insights") {
-            InsightsScreen()
+        // ---------- ADD TRANSACTION ----------
+        composable(ADD_TRANSACTION) {
+            AddExpenseScreen(
+                viewModel = transactionViewModel,
+                onBack = {
+                    navController.navigate(BUDGETS) {
+                        popUpTo(BUDGETS) { inclusive = true }
+                    }
+                }
+            )
         }
 
-        composable("profile") {
-            ProfileScreen()
-        }
-
-        composable("add_transaction") {
-            AddExpenseScreen()
+        // ---------- BUDGET HUB ----------
+        composable(BUDGETS) {
+            BudgetsScreen(
+                onAddTransactionClick = {
+                    navController.navigate(ADD_ENTRY_ROUTER)
+                }
+            )
         }
     }
 }

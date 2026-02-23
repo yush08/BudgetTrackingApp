@@ -18,7 +18,7 @@ class HomeViewModel : ViewModel() {
     fun addIncome(title: String, amount: Double) {
         repository.addTransaction(
             Transaction(
-                id = System.currentTimeMillis().toString(),
+                id = System.currentTimeMillis(), // ✅ Long
                 title = title,
                 amount = amount,
                 type = TransactionType.INCOME
@@ -29,17 +29,11 @@ class HomeViewModel : ViewModel() {
     fun addExpense(title: String, amount: Double) {
         repository.addTransaction(
             Transaction(
-                id = System.currentTimeMillis().toString(),
+                id = System.currentTimeMillis(), // ✅ Long
                 title = title,
                 amount = amount,
                 type = TransactionType.EXPENSE
             )
         )
-    }
-
-    fun totalBalance(): Double {
-        return transactions.value.sumOf {
-            if (it.type == TransactionType.INCOME) it.amount else -it.amount
-        }
     }
 }
