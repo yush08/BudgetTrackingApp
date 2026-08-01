@@ -1,0 +1,28 @@
+# Gradle
+.gradle/
+build/
+**/build/
+local.properties
+
+# Android Studio
+.idea/
+*.iml
+*.log
+.cxx/
+captures/
+
+# Firebase
+google-services.json
+
+
+# Kotlin
+.kotlin/
+
+
+# Keystore
+*.jks
+*.keystore
+
+# OS files
+.DS_Store
+Thumbs.db
